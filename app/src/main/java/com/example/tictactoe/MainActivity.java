@@ -9,16 +9,22 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int EMPTY = 0;
     private static final int PLAYER = 1; // X
     private static final int COMPUTER = 2; // O
 
+
     private int[] board = new int[9];
     private Button[][] buttons = new Button[3][3];
     private TextView tvStatus;
     private boolean gameOver = false;
+    private Random random = new Random();
+    private boolean copmuterHasMoved = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         tvStatus.setText("Ход компьютера...");
         int computerMove = getBestMove();
         makeMove(computerMove, COMPUTER);
+        copmuterHasMoved = true;
         if (checkWin(COMPUTER)) {
             gameOver = true;
             tvStatus.setText("Компьютер победил!");
@@ -142,7 +149,27 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+
+    private int getRandomEmptyCell() {
+        // Собираем список свободных клеток
+        java.util.ArrayList<Integer> emptyCells = new java.util.ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            if (board[i] == EMPTY) {
+                emptyCells.add(i);
+            }
+        }
+        if (emptyCells.isEmpty()) return -1;
+        int randomIndex = random.nextInt(emptyCells.size());
+        return emptyCells.get(randomIndex);
+    }
+
     private int getBestMove() {
+
+        if (!copmuterHasMoved) {
+            return getRandomEmptyCell();
+        }
+
         int bestScore = Integer.MIN_VALUE;
         int bestMove = -1;
 
@@ -201,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         gameOver = false;
+        copmuterHasMoved = false;
         tvStatus.setText("Ваш ход (X)");
     }
 }
